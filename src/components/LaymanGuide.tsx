@@ -21,9 +21,16 @@ export default function LaymanGuide() {
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">
                             Who pays NOTHING?
                         </h3>
-                        <p className="text-gray-600 mb-6 leading-relaxed">
-                            If you earn <strong>₦800,000 or less</strong> in a whole year (salary + allowances), you pay <strong>zero tax</strong>.
+                        <p className="text-gray-600 leading-relaxed">
+                            You don't need to calculate this yourself! Your employer does it for you (PAYE). If you run a business, you file with the <strong>Nigeria Revenue Service (NRS)</strong>.
                         </p>
+                        <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <h4 className="font-semibold text-gray-900 mb-2">New for 2026:</h4>
+                            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+                                <li><strong>VAT-Free:</strong> Essential food and healthcare items are now VAT-free.</li>
+                                <li><strong>Small Biz:</strong> 50 new exemptions for small businesses and low-income earners.</li>
+                            </ul>
+                        </div>
                         <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 text-sm">
                             <p className="font-bold text-gray-900 mb-2 uppercase tracking-wide text-xs">Example</p>
                             <div className="space-y-1 text-gray-700">

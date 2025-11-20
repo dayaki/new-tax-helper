@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Calculator, Info, ChevronRight } from "lucide-react";
+import CurrencyInput from "./CurrencyInput";
 
 export default function TaxCalculator() {
     const [employmentType, setEmploymentType] = useState("salaried");
@@ -198,12 +199,10 @@ export default function TaxCalculator() {
                                     <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">
                                         How much do you earn? (₦)
                                     </label>
-                                    <input
-                                        type="number"
+                                    <CurrencyInput
                                         value={incomeAmount}
-                                        onChange={(e) => setIncomeAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                                        onChange={(val) => setIncomeAmount(val)}
                                         placeholder="e.g. 500,000"
-                                        className="w-full bg-gray-50 border-transparent rounded-2xl py-3 px-4 text-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all placeholder:text-gray-400"
                                     />
                                 </div>
                             </div>
@@ -222,23 +221,21 @@ export default function TaxCalculator() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-xs font-medium text-gray-500 mb-2 ml-1">Annual Rent Paid (₦)</label>
-                                        <input
-                                            type="number"
+                                        <CurrencyInput
                                             value={rentAmount}
-                                            onChange={(e) => setRentAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                                            onChange={(val) => setRentAmount(val)}
                                             placeholder="0"
-                                            className="w-full bg-gray-50 border-transparent rounded-2xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all"
+                                            className="text-sm"
                                         />
                                     </div>
 
                                     <div>
                                         <label className="block text-xs font-medium text-gray-500 mb-2 ml-1">Pension Contribution (₦)</label>
-                                        <input
-                                            type="number"
+                                        <CurrencyInput
                                             value={pensionAmount}
-                                            onChange={(e) => setPensionAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                                            onChange={(val) => setPensionAmount(val)}
                                             placeholder="0"
-                                            className="w-full bg-gray-50 border-transparent rounded-2xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all"
+                                            className="text-sm"
                                         />
                                     </div>
                                 </div>

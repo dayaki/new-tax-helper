@@ -17,12 +17,28 @@ const faqs = [
         answer: "You can apply for a Joint Tax Board (JTB) TIN online at the JTB website or visit the nearest tax office. Your BVN or NIN is usually required for registration."
     },
     {
+        question: "How do I pay my tax?",
+        answer: "For most employees, it's automatic (PAYE). For business owners, you'll file with the Nigeria Revenue Service (NRS) or your State Internal Revenue Service."
+    },
+    {
+        question: "Do I pay tax on Government Bonds?",
+        answer: "No. Income from Nigerian government bonds remains tax-free under the new 2026 law."
+    },
+    {
+        question: "I work remotely for a foreign company, do I pay tax?",
+        answer: "Yes. You must declare your income. Nigeria has partnered with over 100 countries to share data and track remote worker income."
+    },
+    {
+        question: "Will my past investment gains be taxed?",
+        answer: "No. The new Capital Gains Tax rules only apply to gains made from January 1, 2026. Past gains are exempt."
+    },
+    {
         question: "When do I file my taxes?",
         answer: "For individuals, the deadline for filing tax returns is usually March 31st of the following year. For example, you file for 2026 income by March 31st, 2027."
     },
     {
         question: "Is this federal or state tax?",
-        answer: "Personal Income Tax is a federal law but it is collected by the State Government where you reside (e.g., LIRS for Lagos, FIRS for Abuja residents and specific categories like police/military)."
+        answer: "Personal Income Tax is a federal law but it is collected by the State Government where you reside (e.g., LIRS for Lagos, NRS for Abuja residents and specific categories like police/military)."
     },
     {
         question: "What if my salary is irregular?",
