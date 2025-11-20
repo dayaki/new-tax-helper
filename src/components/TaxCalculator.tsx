@@ -6,27 +6,31 @@ import CurrencyInput from "./CurrencyInput";
 
 export default function TaxCalculator() {
     const [employmentType, setEmploymentType] = useState("salaried");
-    const [incomeType, setIncomeType] = useState("monthly");
     const [incomeAmount, setIncomeAmount] = useState<number | "">("");
     const [rentAmount, setRentAmount] = useState<number | "">("");
-    const [pensionAmount, setPensionAmount] = useState<number | "">("");
+    const [pensionRate, setPensionRate] = useState(8);
+    const [nhfRate, setNhfRate] = useState(2.5);
 
     const calculateTax = () => {
         if (!incomeAmount) return null;
 
         let annualIncome = Number(incomeAmount);
-        if (incomeType === "weekly") annualIncome *= 52;
-        if (incomeType === "monthly") annualIncome *= 12;
-
         // Deductions
         // Rent Relief: Lower of N500,000 or 20% of Annual Rent
         const rentRelief = rentAmount ? Math.min(500000, Number(rentAmount) * 0.2) : 0;
 
-        // Pension: User input
-        const pensionDeduction = pensionAmount ? Number(pensionAmount) : 0;
+        // Pension: 8% of Gross (default)
+        const pensionDeduction = (annualIncome * pensionRate) / 100;
+
+        // NHF: 2.5% of Gross
+        const nhfDeduction = (annualIncome * nhfRate) / 100;
+
+        // Consolidated Relief Allowance (CRA) - New Law simplifies this? 
+        // Actually, the prompt implies using these specific deductions. 
+        // The new law has specific reliefs. We'll stick to the user's request for these sliders.
 
         // Taxable Income
-        let taxableIncome = Math.max(0, annualIncome - rentRelief - pensionDeduction);
+        let taxableIncome = Math.max(0, annualIncome - rentRelief - pensionDeduction - nhfDeduction);
         let taxPayable = 0;
         let breakdown = [];
 
@@ -81,10 +85,11 @@ export default function TaxCalculator() {
 
         return {
             annualIncome,
-            taxableIncome: Math.max(0, annualIncome - rentRelief - pensionDeduction),
+            taxableIncome,
             taxPayable,
             rentRelief,
             pensionDeduction,
+            nhfDeduction,
             breakdown,
             effectiveRate: annualIncome > 0 ? (taxPayable / annualIncome) * 100 : 0
         };
@@ -142,7 +147,7 @@ export default function TaxCalculator() {
 
     const result = calculateTax();
     const oldTax = (result && employmentType === "salaried") ? calculateOldTax(result.annualIncome, result.pensionDeduction) : null;
-    const monthlyNewTakeHome = result ? (result.annualIncome - result.taxPayable - result.pensionDeduction) / 12 : 0;
+    const monthlyNewTakeHome = result ? (result.annualIncome - result.taxPayable - result.pensionDeduction - result.nhfDeduction) / 12 : 0;
     const monthlyOldTakeHome = (result && oldTax !== null) ? (result.annualIncome - oldTax - result.pensionDeduction) / 12 : 0;
     const monthlyGain = monthlyNewTakeHome - monthlyOldTakeHome;
 
@@ -178,31 +183,49 @@ export default function TaxCalculator() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">How often are you paid?</label>
-                                    <div className="relative">
-                                        <select
-                                            value={incomeType}
-                                            onChange={(e) => setIncomeType(e.target.value)}
-                                            className="w-full appearance-none bg-gray-50 border-transparent rounded-2xl py-3 px-4 text-gray-900 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all"
-                                        >
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                            <option value="annual">Annual</option>
-                                        </select>
-                                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rotate-90 pointer-events-none" />
-                                    </div>
-                                </div>
-
+                            <div className="grid grid-cols-1 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">
-                                        How much do you earn? (₦)
+                                        What is your Annual Gross Salary? (₦)
                                     </label>
                                     <CurrencyInput
                                         value={incomeAmount}
                                         onChange={(val) => setIncomeAmount(val)}
-                                        placeholder="e.g. 500,000"
+                                        placeholder="e.g. 5,000,000"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <div className="flex justify-between items-center mb-2 ml-1">
+                                        <label className="block text-xs font-medium text-gray-500">Pension Rate</label>
+                                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">{pensionRate}%</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="20"
+                                        step="0.5"
+                                        value={pensionRate}
+                                        onChange={(e) => setPensionRate(Number(e.target.value))}
+                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-2 ml-1">
+                                        <label className="block text-xs font-medium text-gray-500">NHF Rate</label>
+                                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">{nhfRate}%</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="5"
+                                        step="0.1"
+                                        value={nhfRate}
+                                        onChange={(e) => setNhfRate(Number(e.target.value))}
+                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                                     />
                                 </div>
                             </div>
@@ -229,15 +252,6 @@ export default function TaxCalculator() {
                                         />
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-500 mb-2 ml-1">Pension Contribution (₦)</label>
-                                        <CurrencyInput
-                                            value={pensionAmount}
-                                            onChange={(val) => setPensionAmount(val)}
-                                            placeholder="0"
-                                            className="text-sm"
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -302,44 +316,56 @@ export default function TaxCalculator() {
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Tax-Free Allowance</span>
-                                        <span className="font-medium text-gray-900">-₦{(result.rentRelief + result.pensionDeduction).toLocaleString()}</span>
+                                        <span className="font-medium text-gray-900">-₦{(result.rentRelief + result.pensionDeduction + result.nhfDeduction).toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm pt-3 border-t border-gray-100">
-                                        <span className="text-gray-900 font-bold">Amount Taxed</span>
-                                        <span className="font-bold text-gray-900">₦{result.taxableIncome.toLocaleString()}</span>
+                                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 pl-2">
+                                        <div>Pension ({pensionRate}%)</div>
+                                        <div className="text-right">-₦{result.pensionDeduction.toLocaleString()}</div>
+                                        <div>NHF ({nhfRate}%)</div>
+                                        <div className="text-right">-₦{result.nhfDeduction.toLocaleString()}</div>
+                                        {result.rentRelief > 0 && (
+                                            <>
+                                                <div>Rent Relief</div>
+                                                <div className="text-right">-₦{result.rentRelief.toLocaleString()}</div>
+                                            </>
+                                        )}
+                                        <div className="flex justify-between text-sm pt-3 border-t border-gray-100">
+                                            <span className="text-gray-900 font-bold">Amount Taxed</span>
+                                            <span className="font-bold text-gray-900">₦{result.taxableIncome.toLocaleString()}</span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div>
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">How it's calculated</h4>
-                                    <div className="space-y-3">
-                                        {result.breakdown.map((item, idx) => (
-                                            item.amount > 0 || item.rate === "0%" ? (
-                                                <div key={idx} className="flex justify-between text-xs items-center">
-                                                    <div className="flex items-center">
-                                                        <div className={`w-2 h-2 rounded-full mr-2 ${item.rate === "0%" ? "bg-gray-400" : "bg-primary"}`}></div>
-                                                        <span className="text-gray-600">{item.band}</span>
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">How it's calculated</h4>
+                                        <div className="space-y-3">
+                                            {result.breakdown.map((item, idx) => (
+                                                item.amount > 0 || item.rate === "0%" ? (
+                                                    <div key={idx} className="flex justify-between text-xs items-center">
+                                                        <div className="flex items-center">
+                                                            <div className={`w-2 h-2 rounded-full mr-2 ${item.rate === "0%" ? "bg-gray-400" : "bg-primary"}`}></div>
+                                                            <span className="text-gray-600">{item.band}</span>
+                                                        </div>
+                                                        <div className="flex items-center">
+                                                            <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] mr-2 font-medium">{item.rate}</span>
+                                                            <span className="font-medium text-gray-900">₦{item.amount.toLocaleString()}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center">
-                                                        <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] mr-2 font-medium">{item.rate}</span>
-                                                        <span className="font-medium text-gray-900">₦{item.amount.toLocaleString()}</span>
-                                                    </div>
-                                                </div>
-                                            ) : null
-                                        ))}
+                                                ) : null
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
 
-                                {result.taxPayable === 0 && (
-                                    <div className="bg-gray-50 text-gray-900 text-sm p-4 rounded-2xl border border-gray-200 text-center font-medium">
-                                        🎉 You pay ZERO tax!
-                                    </div>
-                                )}
+                                    {result.taxPayable === 0 && (
+                                        <div className="bg-gray-50 text-gray-900 text-sm p-4 rounded-2xl border border-gray-200 text-center font-medium">
+                                            🎉 You pay ZERO tax!
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
