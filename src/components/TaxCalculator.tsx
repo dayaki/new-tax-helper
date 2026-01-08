@@ -9,6 +9,7 @@ export default function TaxCalculator() {
     const [incomeAmount, setIncomeAmount] = useState<number | "">("");
     const [rentAmount, setRentAmount] = useState<number | "">("");
     const [pensionRate, setPensionRate] = useState(8);
+    const [deductNhf, setDeductNhf] = useState(false);
     const [nhfRate, setNhfRate] = useState(2.5);
 
     const calculateTax = () => {
@@ -22,8 +23,8 @@ export default function TaxCalculator() {
         // Pension: 8% of Gross (default)
         const pensionDeduction = (annualIncome * pensionRate) / 100;
 
-        // NHF: 2.5% of Gross
-        const nhfDeduction = (annualIncome * nhfRate) / 100;
+        // NHF: 2.5% of Gross (if enabled)
+        const nhfDeduction = deductNhf ? (annualIncome * nhfRate) / 100 : 0;
 
         // Consolidated Relief Allowance (CRA) - New Law simplifies this? 
         // Actually, the prompt implies using these specific deductions. 
@@ -173,7 +174,7 @@ export default function TaxCalculator() {
                                             key={type}
                                             onClick={() => setEmploymentType(type)}
                                             className={`px-4 py-3 text-sm font-medium rounded-2xl border transition-all ${employmentType === type
-                                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/25"
+                                                ? "bg-white text-primary border-primary shadow-sm ring-1 ring-primary"
                                                 : "bg-gray-50 border-transparent text-gray-600 hover:bg-gray-100"
                                                 } capitalize`}
                                         >
@@ -213,21 +214,34 @@ export default function TaxCalculator() {
                                     />
                                 </div>
 
-                                <div>
-                                    <div className="flex justify-between items-center mb-2 ml-1">
-                                        <label className="block text-xs font-medium text-gray-500">NHF Rate</label>
-                                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">{nhfRate}%</span>
+                                {deductNhf && (
+                                    <div className="animate-fade-in-up">
+                                        <div className="flex justify-between items-center mb-2 ml-1">
+                                            <label className="block text-xs font-medium text-gray-500">NHF Rate</label>
+                                            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">{nhfRate}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="5"
+                                            step="0.1"
+                                            value={nhfRate}
+                                            onChange={(e) => setNhfRate(Number(e.target.value))}
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                                        />
                                     </div>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="5"
-                                        step="0.1"
-                                        value={nhfRate}
-                                        onChange={(e) => setNhfRate(Number(e.target.value))}
-                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                                    />
-                                </div>
+                                )}
+                            </div>
+
+                            <div className="mt-2 flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="deductNhf"
+                                    checked={deductNhf}
+                                    onChange={(e) => setDeductNhf(e.target.checked)}
+                                    className="w-3 h-3 text-primary rounded border-gray-300 focus:ring-primary mr-2"
+                                />
+                                <label htmlFor="deductNhf" className="text-xs text-gray-600 cursor-pointer select-none">Deduct NHF</label>
                             </div>
 
                             <div className="pt-6 border-t border-gray-100">
@@ -321,8 +335,13 @@ export default function TaxCalculator() {
                                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 pl-2">
                                         <div>Pension ({pensionRate}%)</div>
                                         <div className="text-right">-₦{result.pensionDeduction.toLocaleString()}</div>
-                                        <div>NHF ({nhfRate}%)</div>
-                                        <div className="text-right">-₦{result.nhfDeduction.toLocaleString()}</div>
+                                        <div className="text-right">-₦{result.pensionDeduction.toLocaleString()}</div>
+                                        {deductNhf && (
+                                            <>
+                                                <div>NHF ({nhfRate}%)</div>
+                                                <div className="text-right">-₦{result.nhfDeduction.toLocaleString()}</div>
+                                            </>
+                                        )}
                                         {result.rentRelief > 0 && (
                                             <>
                                                 <div>Rent Relief</div>

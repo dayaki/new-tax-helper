@@ -16,7 +16,7 @@ export default function Navbar() {
 
                 <div className="hidden sm:flex sm:space-x-8">
                     <Link
-                        href="/calculator"
+                        href="/"
                         className="text-gray-600 hover:text-primary inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors"
                     >
                         <Calculator className="w-4 h-4 mr-2" />
