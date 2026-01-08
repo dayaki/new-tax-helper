@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   output: "export",
+  basePath: "/new-tax-helper",
+  assetPrefix: "/new-tax-helper/",
 };
 
 export default nextConfig;
